@@ -132,7 +132,6 @@ export function resetScales(
 				lengthUnitWidth / getSmallerUnitCount(minUnit, lengthUnit)
 			) || 1;
 	}
-
 	return {
 		rows,
 		width: fullWidth,

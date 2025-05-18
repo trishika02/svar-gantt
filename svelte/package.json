@@ -39,8 +39,8 @@
 		"wx-lib-state": "1.9.0",
 		"wx-lib-svelte": "0.5.1",
 		"wx-svelte-core": "2.1.0",
-		"wx-svelte-menu": "2.1.0",
 		"wx-svelte-grid": "2.1.0",
+		"wx-svelte-menu": "2.1.0",
 		"wx-svelte-toolbar": "2.1.0"
 	},
 	"files": [

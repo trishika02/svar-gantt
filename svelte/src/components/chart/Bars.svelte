@@ -55,7 +55,8 @@
 	}
 
 	function down(node, point) {
-		const { clientX } = point;
+		const { clientX, clientY } = point;
+
 		const id = getID(node);
 		const task = api.getTask(id);
 		const css = point.target.classList;
@@ -79,10 +80,13 @@
 					id,
 					mode,
 					x: clientX,
+					y:clientY,
 					dx: 0,
+					t:task.$y,
 					l: task.$x,
 					w: task.$w,
 				};
+				
 			}
 			startDrag();
 		}
@@ -104,6 +108,7 @@
 	function touchmove(e) {
 		if (touched) {
 			e.preventDefault();
+			
 			move(e, e.touches[0]);
 		} else if (touchTimer) {
 			clearTimeout(touchTimer);
@@ -116,8 +121,8 @@
 	}
 
 	function move(e, point) {
-		const { clientX } = point;
-
+		const { clientX, clientY } = point;
+		
 		if (!readonly) {
 			if (progressFrom) {
 				const { node, x, id } = progressFrom;
@@ -136,8 +141,9 @@
 					inProgress: true,
 				});
 			} else if (taskMove) {
-				const { mode, l, w, x, id, start } = taskMove;
+				const { mode, l, t, w, x, y, id, start } = taskMove;
 				const dx = clientX - x;
+				const dy = clientY - y;
 				if (
 					(!start && Math.abs(dx) < 20) ||
 					(mode === "start" && w - dx < lengthUnitWidth) ||
@@ -149,16 +155,20 @@
 					return;
 
 				taskMove.dx = dx;
+				taskMove.dy = dy;
 
-				let left, width;
+				let left, width, top;
 				if (mode === "start") {
-					left = l + dx;
+					//left = l + dx;
+					top = t + dy;
 					width = w - dx;
 				} else if (mode === "end") {
 					left = l;
+					top = t;
 					width = w + dx;
 				} else if (mode === "move") {
 					left = l + dx;
+					top = t + dy;
 					width = w;
 				}
 
@@ -166,6 +176,7 @@
 					id,
 					width: width,
 					left: left,
+					top: top,
 					inProgress: true,
 				};
 
@@ -222,7 +233,8 @@
 			taskMove = null;
 			if (start) {
 				const diff = Math.round(dx / lengthUnitWidth);
-
+				console.log(lengthUnitWidth);
+				
 				if (!diff) {
 					// restore node and link position
 					api.exec("drag-task", {
@@ -237,6 +249,8 @@
 					if (mode == "move") {
 						update.start = task.start;
 						update.end = task.end;
+						console.log(task);
+						
 					} else update[mode] = task[mode];
 
 					api.exec("update-task", {
@@ -363,7 +377,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="wx-bars"
-	style="line-height: {tasks.length ? tasks[0].$h : 0}px"
+	style="line-height: {tasks.length ? tasks[0].$h : 0}px;"
 	bind:offsetWidth={totalWidth}
 	oncontextmenu={contextmenu}
 	onmousedown={mousedown}
